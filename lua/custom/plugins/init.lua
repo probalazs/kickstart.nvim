@@ -5,4 +5,21 @@
 
 ---@module 'lazy'
 ---@type LazySpec
-return {}
+return {
+  {
+    'famiu/bufdelete.nvim',
+    keys = {
+      { '<leader>bd', '<cmd>Bdelete<CR>', desc = '[B]uffer [D]elete' },
+    },
+  },
+  { 'editorconfig/editorconfig-vim' },
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    opts = {
+      open_mapping = [[<C-\>]],
+      direction = 'horizontal',
+      size = 15,
+    },
+  },
+}
