@@ -14,6 +14,18 @@ return {
   },
   { 'editorconfig/editorconfig-vim' },
   {
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    keys = {
+      { 's', function() require('flash').jump() end, mode = { 'n', 'x', 'o' }, desc = 'Flash jump' },
+      { 'S', function() require('flash').treesitter() end, mode = { 'n', 'x', 'o' }, desc = 'Flash treesitter' },
+    },
+  },
+  {
+    'mg979/vim-visual-multi',
+    event = 'VeryLazy',
+  },
+  {
     'akinsho/toggleterm.nvim',
     version = '*',
     opts = {
