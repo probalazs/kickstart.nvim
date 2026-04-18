@@ -18,8 +18,8 @@ return {
     version = '*',
     opts = {
       open_mapping = [[<C-\>]],
-      direction = 'horizontal',
-      size = 15,
+      direction = 'vertical',
+      size = 80,
     },
   },
 }
