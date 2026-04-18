@@ -225,6 +225,10 @@ vim.keymap.set('n', '<leader>sh', '<cmd>sp<CR>', { desc = '[S]plit [H]orizontal'
 
 local llama_job_id = nil
 
+vim.api.nvim_create_user_command('LlamaToggle', function()
+  vim.cmd 'call llama#toggle()'
+end, { desc = 'Toggle llama.vim completion' })
+
 vim.api.nvim_create_user_command('LlamaStart', function()
   if llama_job_id then
     vim.notify('llama-server is already running', vim.log.levels.WARN)

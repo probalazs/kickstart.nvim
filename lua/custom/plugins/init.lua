@@ -21,6 +21,7 @@ return {
         ring_n_chunks = 64,   -- more project context chunks
         ring_chunk_size = 64, -- smaller chunks for speed
         ring_scope = 2048,    -- wider scope around cursor
+        show_info = 0,        -- disable inline timing/info display
       }
     end,
   },

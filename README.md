@@ -41,6 +41,11 @@ External Requirements:
   - If you want to write Typescript, you need `npm`
   - If you want to write Golang, you will need `go`
   - etc.
+- [llama.cpp](https://github.com/ggml-org/llama.cpp) (optional, for local AI code completion via llama.vim)
+  - macOS: `brew install llama.cpp`
+  - Other platforms: see [llama.cpp installation](https://github.com/ggml-org/llama.cpp#installation)
+  - Start the server with: `:LlamaStart` inside Neovim (uses `qwen2.5` FIM model by default)
+  - Stop the server with: `:LlamaStop` (also stops automatically when Neovim exits)
 
 > [!NOTE]
 > See [Install Recipes](#Install-Recipes) for additional Windows and Linux specific notes
