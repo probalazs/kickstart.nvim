@@ -223,6 +223,36 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<leader>sv', '<cmd>vsp<CR>', { desc = '[S]plit [V]ertical' })
 vim.keymap.set('n', '<leader>sh', '<cmd>sp<CR>', { desc = '[S]plit [H]orizontal' })
 
+local llama_job_id = nil
+
+vim.api.nvim_create_user_command('LlamaStart', function()
+  if llama_job_id then
+    vim.notify('llama-server is already running', vim.log.levels.WARN)
+    return
+  end
+  llama_job_id = vim.fn.jobstart('llama-server --fim-qwen-3b-default -c 16384', { detach = true })
+  vim.notify('llama-server started', vim.log.levels.INFO)
+end, { desc = 'Start llama-server' })
+
+vim.api.nvim_create_user_command('LlamaStop', function()
+  if not llama_job_id then
+    vim.notify('llama-server is not running', vim.log.levels.WARN)
+    return
+  end
+  vim.fn.jobstop(llama_job_id)
+  llama_job_id = nil
+  vim.notify('llama-server stopped', vim.log.levels.INFO)
+end, { desc = 'Stop llama-server' })
+
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  callback = function()
+    if llama_job_id then
+      vim.fn.jobstop(llama_job_id)
+      llama_job_id = nil
+    end
+  end,
+})
+
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -779,7 +809,7 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'super-tab',
+        preset = 'default',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
