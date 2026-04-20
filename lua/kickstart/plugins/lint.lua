@@ -58,7 +58,11 @@ return {
         -- describe the hovered symbol using Markdown.
         if vim.bo.modifiable then
           local linters = lint.linters_by_ft[vim.bo.filetype] or {}
-          local available = vim.tbl_filter(function(l) return vim.fn.executable(lint.linters[l] and lint.linters[l].cmd or l) == 1 end, linters)
+          local available = vim.tbl_filter(function(l)
+            local linter = lint.linters[l]
+            local cmd = type(linter) == 'table' and linter.cmd or l
+            return type(cmd) == 'string' and vim.fn.executable(cmd) == 1
+          end, linters)
           if #available > 0 then lint.try_lint(available) end
         end
       end,
