@@ -206,6 +206,7 @@ vim.o.scrolloff = 10
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
 vim.o.confirm = true
+vim.o.termguicolors = true
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -930,12 +931,11 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'rose-pine/neovim',
-    name = 'rose-pine',
+    'folke/tokyonight.nvim',
     priority = 1000,
     config = function()
-      require('rose-pine').setup { variant = 'moon' }
-      vim.cmd.colorscheme 'rose-pine'
+      require('tokyonight').setup { style = 'night' }
+      vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
 
