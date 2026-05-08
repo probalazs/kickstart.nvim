@@ -259,44 +259,10 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<leader>sv', '<cmd>vsp<CR>', { desc = '[S]plit [V]ertical' })
 vim.keymap.set('n', '<leader>sh', '<cmd>sp<CR>', { desc = '[S]plit [H]orizontal' })
 
-local llama_job_id = nil
-
-vim.api.nvim_create_user_command('LlamaToggle', function()
-  vim.cmd 'call llama#toggle()'
-end, { desc = 'Toggle llama.vim completion' })
-
-vim.api.nvim_create_user_command('LlamaStart', function()
-  if llama_job_id then
-    vim.notify('llama-server is already running', vim.log.levels.WARN)
-    return
-  end
-  llama_job_id = vim.fn.jobstart('llama-server --fim-qwen-3b-default -c 16384', { detach = true })
-  vim.notify('llama-server started', vim.log.levels.INFO)
-end, { desc = 'Start llama-server' })
-
-vim.api.nvim_create_user_command('LlamaStop', function()
-  if not llama_job_id then
-    vim.notify('llama-server is not running', vim.log.levels.WARN)
-    return
-  end
-  vim.fn.jobstop(llama_job_id)
-  llama_job_id = nil
-  vim.notify('llama-server stopped', vim.log.levels.INFO)
-end, { desc = 'Stop llama-server' })
-
 vim.api.nvim_create_autocmd('InsertLeave', {
   callback = function()
     if vim.bo.modified and vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
       vim.cmd 'silent! write'
-    end
-  end,
-})
-
-vim.api.nvim_create_autocmd('VimLeavePre', {
-  callback = function()
-    if llama_job_id then
-      vim.fn.jobstop(llama_job_id)
-      llama_job_id = nil
     end
   end,
 })

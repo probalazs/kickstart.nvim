@@ -14,18 +14,6 @@ return {
   },
   { 'editorconfig/editorconfig-vim' },
   {
-    'ggml-org/llama.vim',
-    init = function()
-      vim.g.llama_config = {
-        n_predict = 256,      -- longer suggestions
-        ring_n_chunks = 64,   -- more project context chunks
-        ring_chunk_size = 64, -- smaller chunks for speed
-        ring_scope = 2048,    -- wider scope around cursor
-        show_info = 0,        -- disable inline timing/info display
-      }
-    end,
-  },
-  {
     'folke/flash.nvim',
     event = 'VeryLazy',
     keys = {
