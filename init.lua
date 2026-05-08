@@ -162,36 +162,6 @@ vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 
--- Native treesitter: enable highlighting for allowed filetypes
-local treesitter_filetypes = {
-  -- config / data
-  'json', 'jsonc', 'yaml', 'toml',
-  -- web
-  'html', 'css', 'javascript', 'typescript', 'tsx', 'jsx',
-  -- scripting / systems
-  'python', 'bash', 'sh',
-  'go', 'rust', 'c', 'cpp',
-  -- neovim
-  'lua', 'vim', 'vimdoc', 'query',
-  -- docs / vcs
-  'markdown', 'markdown_inline', 'diff', 'gitcommit',
-}
-local treesitter_ft_set = {}
-for _, ft in ipairs(treesitter_filetypes) do
-  treesitter_ft_set[ft] = true
-end
-
-vim.api.nvim_create_autocmd('FileType', {
-  group = vim.api.nvim_create_augroup('native-treesitter', { clear = true }),
-  callback = function(args)
-    local ft = vim.bo[args.buf].filetype
-    if not treesitter_ft_set[ft] then return end
-    local lang = vim.treesitter.language.get_lang(ft)
-    if lang and pcall(vim.treesitter.language.add, lang) then
-      vim.treesitter.start(args.buf, lang)
-    end
-  end,
-})
 
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
@@ -685,17 +655,22 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       ---@type table<string, vim.lsp.Config>
       local servers = {
-        -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
-        ts_ls = {},
-
+        -- systems
+        clangd = {},
+        rust_analyzer = {},
+        gopls = {},
+        -- web
+        cssls = {},
+        html = {},
+        -- scripting
+        pyright = {},
+        bashls = {},
+        -- data / config
+        yamlls = {},
+        jsonls = {},
+        taplo = {},
+        dockerls = {},
+        marksman = {},
         stylua = {}, -- Used to format Lua code
 
         -- Special Lua Config, as recommended by neovim help docs
@@ -897,16 +872,26 @@ require('lazy').setup({
     },
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
     priority = 1000,
     config = function()
-      require('tokyonight').setup { style = 'night' }
-      vim.cmd.colorscheme 'tokyonight-night'
+      require('catppuccin').setup {
+        flavour = 'mocha',
+        integrations = {
+          native_lsp = {
+            enabled = true,
+            underlines = {
+              errors = { 'underline' },
+              hints = { 'underline' },
+              warnings = { 'underline' },
+              information = { 'underline' },
+            },
+          },
+        },
+      }
+      vim.cmd.colorscheme 'catppuccin'
     end,
   },
 
