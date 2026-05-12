@@ -162,51 +162,49 @@ vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 
--- Incremental selection using LSP selectionRange (VS Code-like expand/shrink)
-local _lsp_sel_stack = {}
+-- Incremental selection using native treesitter (VS Code-like expand/shrink)
+local _ts_node_stack = {}
 
-local function apply_lsp_range(range)
-  local sl = range.start.line
-  local sc = range.start.character
-  local el = range['end'].line
-  local ec = range['end'].character
-  if ec > 0 then
-    ec = ec - 1
+local function ts_select_node(node)
+  local sr, sc, er, ec = node:range()
+  if ec == 0 then
+    er = er - 1
+    ec = #vim.api.nvim_buf_get_lines(0, er, er + 1, false)[1]
   else
-    el = el - 1
-    ec = #vim.api.nvim_buf_get_lines(0, el, el + 1, false)[1]
+    ec = ec - 1
   end
-  vim.api.nvim_win_set_cursor(0, { sl + 1, sc })
-  vim.cmd 'normal! v'
-  vim.api.nvim_win_set_cursor(0, { el + 1, ec })
+  local esc = vim.api.nvim_replace_termcodes('<Esc>', true, true, true)
+  vim.api.nvim_feedkeys(esc, 'x', false)
+  vim.api.nvim_win_set_cursor(0, { sr + 1, sc })
+  vim.api.nvim_feedkeys('v', 'x', false)
+  vim.api.nvim_win_set_cursor(0, { er + 1, ec })
 end
 
 vim.keymap.set('n', '<C-space>', function()
   local bufnr = vim.api.nvim_get_current_buf()
-  local cursor = vim.api.nvim_win_get_cursor(0)
-  local params = {
-    textDocument = { uri = vim.uri_from_bufnr(bufnr) },
-    positions = { { line = cursor[1] - 1, character = cursor[2] } },
-  }
-  vim.lsp.buf_request(bufnr, 'textDocument/selectionRange', params, function(err, result)
-    if err or not result or #result == 0 then return end
-    _lsp_sel_stack = { result[1] }
-    apply_lsp_range(result[1].range)
-  end)
-end, { desc = 'LSP: start selection range' })
+  local ok, parser = pcall(vim.treesitter.get_parser, bufnr)
+  if not ok or not parser then return end
+  parser:parse()
+  local node = vim.treesitter.get_node()
+  if not node then return end
+  _ts_node_stack = { node }
+  ts_select_node(node)
+end, { desc = 'Select treesitter node' })
 
 vim.keymap.set('x', '<C-space>', function()
-  local top = _lsp_sel_stack[#_lsp_sel_stack]
-  if not top or not top.parent then return end
-  table.insert(_lsp_sel_stack, top.parent)
-  apply_lsp_range(top.parent.range)
-end, { desc = 'LSP: expand selection range' })
+  local top = _ts_node_stack[#_ts_node_stack]
+  if not top then return end
+  local parent = top:parent()
+  if not parent then return end
+  table.insert(_ts_node_stack, parent)
+  ts_select_node(parent)
+end, { desc = 'Expand treesitter selection' })
 
 vim.keymap.set('x', '<bs>', function()
-  if #_lsp_sel_stack <= 1 then return end
-  table.remove(_lsp_sel_stack)
-  apply_lsp_range(_lsp_sel_stack[#_lsp_sel_stack].range)
-end, { desc = 'LSP: shrink selection range' })
+  if #_ts_node_stack <= 1 then return end
+  table.remove(_ts_node_stack)
+  ts_select_node(_ts_node_stack[#_ts_node_stack])
+end, { desc = 'Shrink treesitter selection' })
 
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
