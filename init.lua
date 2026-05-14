@@ -666,12 +666,21 @@ require('lazy').setup({
           map('<leader>lR', function()
             local bufnr = vim.api.nvim_get_current_buf()
             vim.diagnostic.reset(nil, bufnr)
-            vim.cmd 'TSToolsRestartTsServer'
+            vim.cmd 'LspRestart'
             vim.defer_fn(function()
               local ok, lint = pcall(require, 'lint')
               if ok then lint.try_lint() end
             end, 2000)
           end, '[L]SP Hard [R]eset')
+
+          if client and client.name == 'vtsls' then
+            map('<leader>oi', function()
+              vim.lsp.buf.execute_command { command = 'typescript.organizeImports', arguments = { vim.api.nvim_buf_get_name(0) } }
+            end, '[O]rganize [I]mports')
+            map('<leader>ai', function()
+              vim.lsp.buf.execute_command { command = 'typescript.addMissingImports', arguments = { vim.api.nvim_buf_get_name(0) } }
+            end, '[A]dd Missing [I]mports')
+          end
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
@@ -734,6 +743,31 @@ require('lazy').setup({
         dockerls = {},
         marksman = {},
         stylua = {}, -- Used to format Lua code
+
+        vtsls = {
+          settings = {
+            typescript = {
+              inlayHints = {
+                parameterNames = { enabled = 'all', suppressWhenArgumentMatchesName = true },
+                parameterTypes = { enabled = true },
+                variableTypes = { enabled = true, suppressWhenTypeMatchesName = true },
+                propertyDeclarationTypes = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                enumMemberValues = { enabled = true },
+              },
+            },
+            javascript = {
+              inlayHints = {
+                parameterNames = { enabled = 'all', suppressWhenArgumentMatchesName = true },
+                parameterTypes = { enabled = true },
+                variableTypes = { enabled = true, suppressWhenTypeMatchesName = true },
+                propertyDeclarationTypes = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                enumMemberValues = { enabled = true },
+              },
+            },
+          },
+        },
 
         -- Special Lua Config, as recommended by neovim help docs
         lua_ls = {
