@@ -58,6 +58,16 @@ return {
     event = 'VeryLazy',
   },
   {
+    'mrjones2014/legendary.nvim',
+    priority = 10000,
+    lazy = false,
+    dependencies = { 'nvim-telescope/telescope.nvim' },
+    keys = { { '<leader>?', '<cmd>Legendary<CR>', desc = '[?] Command palette' } },
+    opts = {
+      extensions = { lazy_nvim = true, which_key = { auto_register = true } },
+    },
+  },
+  {
     'NeogitOrg/neogit',
     dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
     keys = { { '<leader>gg', '<cmd>Neogit<CR>', desc = '[G]it: open Neo[G]it' } },
