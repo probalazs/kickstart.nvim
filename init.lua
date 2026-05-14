@@ -268,6 +268,11 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+vim.keymap.set('n', '<C-Right>', 'w', { desc = 'Next word' })
+vim.keymap.set('n', '<C-Left>', 'b', { desc = 'Prev word' })
+vim.keymap.set('i', '<C-Right>', '<C-o>w', { desc = 'Next word (insert)' })
+vim.keymap.set('i', '<C-Left>', '<C-o>b', { desc = 'Prev word (insert)' })
+
 vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Scroll down (centered)' })
 vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Scroll up (centered)' })
 vim.keymap.set('n', 'n', 'nzzzv', { desc = 'Next search result (centered)' })
