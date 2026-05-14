@@ -26,7 +26,24 @@ return {
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
     ft = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
-    opts = {},
+    keys = {
+      { '<leader>oi', '<cmd>TSToolsOrganizeImports<cr>', desc = '[O]rganize [I]mports' },
+      { '<leader>ai', '<cmd>TSToolsAddMissingImports<cr>', desc = '[A]dd Missing [I]mports' },
+    },
+    opts = {
+      settings = {
+        tsserver_file_preferences = {
+          includeInlayParameterNameHints = 'all',
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+        },
+      },
+    },
   },
   {
     'folke/flash.nvim',

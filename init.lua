@@ -271,10 +271,16 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<leader>sv', '<cmd>vsp<CR>', { desc = '[S]plit [V]ertical' })
 vim.keymap.set('n', '<leader>sh', '<cmd>sp<CR>', { desc = '[S]plit [H]orizontal' })
 
-vim.api.nvim_create_autocmd('InsertLeave', {
+vim.api.nvim_create_autocmd({ 'InsertLeave', 'BufLeave', 'FocusLost' }, {
   callback = function()
-    if vim.bo.modified and vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
-      vim.cmd 'silent! write'
+    if vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
+      local ok, conform = pcall(require, 'conform')
+      if ok then
+        conform.format { async = false, lsp_format = 'fallback', quiet = true }
+      end
+      if vim.bo.modified then
+        vim.cmd 'silent! write'
+      end
     end
   end,
 })
