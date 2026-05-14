@@ -281,17 +281,30 @@ vim.keymap.set('n', 'N', 'Nzzzv', { desc = 'Prev search result (centered)' })
 vim.keymap.set('n', '<leader>sv', '<cmd>vsp<CR>', { desc = '[S]plit [V]ertical' })
 vim.keymap.set('n', '<leader>sh', '<cmd>sp<CR>', { desc = '[S]plit [H]orizontal' })
 
+vim.g.autoformat_enabled = true
+
+vim.api.nvim_create_user_command('ToggleAutoformat', function()
+  vim.g.autoformat_enabled = not vim.g.autoformat_enabled
+  vim.notify('Autoformat ' .. (vim.g.autoformat_enabled and 'enabled' or 'disabled'))
+end, { desc = 'Toggle autoformat on save' })
+
 vim.api.nvim_create_autocmd({ 'InsertLeave', 'BufLeave', 'FocusLost' }, {
   callback = function()
-    if vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
-      local ok, conform = pcall(require, 'conform')
-      if ok then
-        conform.format { async = false, lsp_format = 'fallback', quiet = true }
+    local bufnr = vim.api.nvim_get_current_buf()
+    vim.defer_fn(function()
+      if not vim.api.nvim_buf_is_valid(bufnr) then return end
+      if vim.bo[bufnr].buftype == '' and vim.fn.bufname(bufnr) ~= '' then
+        if vim.g.autoformat_enabled then
+          local ok, conform = pcall(require, 'conform')
+          if ok then
+            conform.format { bufnr = bufnr, async = false, lsp_format = 'fallback', quiet = true }
+          end
+        end
+        if vim.bo[bufnr].modified then
+          vim.api.nvim_buf_call(bufnr, function() vim.cmd 'silent! write' end)
+        end
       end
-      if vim.bo.modified then
-        vim.cmd 'silent! write'
-      end
-    end
+    end, 1500)
   end,
 })
 
