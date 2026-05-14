@@ -288,10 +288,25 @@ vim.api.nvim_create_user_command('ToggleAutoformat', function()
   vim.notify('Autoformat ' .. (vim.g.autoformat_enabled and 'enabled' or 'disabled'))
 end, { desc = 'Toggle autoformat on save' })
 
+local autoformat_timer = nil
+
+local function cancel_autoformat_timer()
+  if autoformat_timer then
+    autoformat_timer:stop()
+    autoformat_timer:close()
+    autoformat_timer = nil
+  end
+end
+
+vim.api.nvim_create_autocmd('InsertEnter', { callback = cancel_autoformat_timer })
+
 vim.api.nvim_create_autocmd({ 'InsertLeave', 'BufLeave', 'FocusLost' }, {
   callback = function()
+    cancel_autoformat_timer()
     local bufnr = vim.api.nvim_get_current_buf()
-    vim.defer_fn(function()
+    autoformat_timer = vim.uv.new_timer()
+    autoformat_timer:start(1500, 0, vim.schedule_wrap(function()
+      cancel_autoformat_timer()
       if not vim.api.nvim_buf_is_valid(bufnr) then return end
       if vim.bo[bufnr].buftype == '' and vim.fn.bufname(bufnr) ~= '' then
         if vim.g.autoformat_enabled then
@@ -304,7 +319,7 @@ vim.api.nvim_create_autocmd({ 'InsertLeave', 'BufLeave', 'FocusLost' }, {
           vim.api.nvim_buf_call(bufnr, function() vim.cmd 'silent! write' end)
         end
       end
-    end, 1500)
+    end))
   end,
 })
 
