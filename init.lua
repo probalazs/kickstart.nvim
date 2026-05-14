@@ -281,45 +281,11 @@ vim.keymap.set('n', 'N', 'Nzzzv', { desc = 'Prev search result (centered)' })
 vim.keymap.set('n', '<leader>sv', '<cmd>vsp<CR>', { desc = '[S]plit [V]ertical' })
 vim.keymap.set('n', '<leader>sh', '<cmd>sp<CR>', { desc = '[S]plit [H]orizontal' })
 
-vim.g.autoformat_enabled = true
-
-vim.api.nvim_create_user_command('ToggleAutoformat', function()
-  vim.g.autoformat_enabled = not vim.g.autoformat_enabled
-  vim.notify('Autoformat ' .. (vim.g.autoformat_enabled and 'enabled' or 'disabled'))
-end, { desc = 'Toggle autoformat on save' })
-
-local autoformat_timer = nil
-
-local function cancel_autoformat_timer()
-  if autoformat_timer then
-    autoformat_timer:stop()
-    autoformat_timer:close()
-    autoformat_timer = nil
-  end
-end
-
-vim.api.nvim_create_autocmd('InsertEnter', { callback = cancel_autoformat_timer })
-
 vim.api.nvim_create_autocmd({ 'InsertLeave', 'BufLeave', 'FocusLost' }, {
   callback = function()
-    cancel_autoformat_timer()
-    local bufnr = vim.api.nvim_get_current_buf()
-    autoformat_timer = vim.uv.new_timer()
-    autoformat_timer:start(1500, 0, vim.schedule_wrap(function()
-      cancel_autoformat_timer()
-      if not vim.api.nvim_buf_is_valid(bufnr) then return end
-      if vim.bo[bufnr].buftype == '' and vim.fn.bufname(bufnr) ~= '' then
-        if vim.g.autoformat_enabled then
-          local ok, conform = pcall(require, 'conform')
-          if ok then
-            conform.format { bufnr = bufnr, async = false, lsp_format = 'fallback', quiet = true }
-          end
-        end
-        if vim.bo[bufnr].modified then
-          vim.api.nvim_buf_call(bufnr, function() vim.cmd 'silent! write' end)
-        end
-      end
-    end))
+    if vim.bo.buftype == '' and vim.fn.expand '%' ~= '' and vim.bo.modified then
+      vim.cmd 'silent! write'
+    end
   end,
 })
 
@@ -696,6 +662,16 @@ require('lazy').setup({
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+          map('<leader>lR', function()
+            local bufnr = vim.api.nvim_get_current_buf()
+            vim.diagnostic.reset(nil, bufnr)
+            vim.cmd 'TSToolsRestartTsServer'
+            vim.defer_fn(function()
+              local ok, lint = pcall(require, 'lint')
+              if ok then lint.try_lint() end
+            end, 2000)
+          end, '[L]SP Hard [R]eset')
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
