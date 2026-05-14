@@ -58,6 +58,15 @@ return {
     event = 'VeryLazy',
   },
   {
+    'NeogitOrg/neogit',
+    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
+    keys = { { '<leader>gg', '<cmd>Neogit<CR>', desc = '[G]it: open Neo[G]it' } },
+    opts = {
+      graph_style = 'unicode',
+      integrations = { diffview = false, telescope = true },
+    },
+  },
+  {
     'akinsho/toggleterm.nvim',
     version = '*',
     opts = {
