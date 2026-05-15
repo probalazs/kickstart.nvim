@@ -673,15 +673,6 @@ require('lazy').setup({
             end, 2000)
           end, '[L]SP Hard [R]eset')
 
-          if client and client.name == 'vtsls' then
-            map('<leader>oi', function()
-              vim.lsp.buf.execute_command { command = 'typescript.organizeImports', arguments = { vim.api.nvim_buf_get_name(0) } }
-            end, '[O]rganize [I]mports')
-            map('<leader>ai', function()
-              vim.lsp.buf.execute_command { command = 'typescript.addMissingImports', arguments = { vim.api.nvim_buf_get_name(0) } }
-            end, '[A]dd Missing [I]mports')
-          end
-
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
@@ -717,6 +708,15 @@ require('lazy').setup({
           -- This may be unwanted, since they displace some of your code
           if client and client:supports_method('textDocument/inlayHint', event.buf) then
             map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
+          end
+
+          if client and client.name == 'vtsls' then
+            map('<leader>oi', function()
+              vim.lsp.buf.execute_command { command = 'typescript.organizeImports', arguments = { vim.api.nvim_buf_get_name(0) } }
+            end, '[O]rganize [I]mports')
+            map('<leader>ai', function()
+              vim.lsp.buf.execute_command { command = 'typescript.addMissingImports', arguments = { vim.api.nvim_buf_get_name(0) } }
+            end, '[A]dd Missing [I]mports')
           end
         end,
       })
