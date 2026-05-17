@@ -45,12 +45,23 @@ return {
     },
   },
   {
+    'sindrets/diffview.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    keys = {
+      { '<leader>gd', '<cmd>DiffviewOpen<CR>',        desc = '[G]it: [D]iffview open' },
+      { '<leader>gh', '<cmd>DiffviewFileHistory %<CR>', desc = '[G]it: file [H]istory' },
+      { '<leader>gH', '<cmd>DiffviewFileHistory<CR>',  desc = '[G]it: repo [H]istory' },
+      { '<leader>gx', '<cmd>DiffviewClose<CR>',        desc = '[G]it: diffview close' },
+    },
+    opts = {},
+  },
+  {
     'NeogitOrg/neogit',
-    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
+    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim', 'sindrets/diffview.nvim' },
     keys = { { '<leader>gg', '<cmd>Neogit<CR>', desc = '[G]it: open Neo[G]it' } },
     opts = {
       graph_style = 'unicode',
-      integrations = { diffview = false, telescope = true },
+      integrations = { diffview = true, telescope = true },
     },
   },
   {
