@@ -1027,6 +1027,13 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
+      -- Comment/uncomment lines and selections.
+      --
+      -- - gcc        - toggle comment on current line
+      -- - gc{motion} - toggle comment over a motion (e.g. gcip for a paragraph)
+      -- - gc          - toggle comment on visual selection (visual mode)
+      require('mini.comment').setup()
+
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
